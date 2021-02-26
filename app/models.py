@@ -14,8 +14,16 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(64), unique=False)
     confirmed = db.Column(db.Boolean, default=False)
+
+    abount_me = db.Column(db.Text, nullable=True)
+    gender = db.Column(db.Enum("M", "F"), nullable=True)
+    birth = db.Column(db.DateTime, nullable=True)
+    location = db.Column(db.String(255), nullable=True)
+    job = db.Column(db.String(255), nullable=True)
+
     last_seen = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
+    updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), nullable=True)
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     comments = db.relationship("Comment", backref="user", lazy="dynamic")
 
