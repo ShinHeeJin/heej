@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Heej{% endblock %}
+{% import "_macros.html" as macros %}
+{% block page_content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="my-3 p-3 bg-white rounded shadow-sm">
+                {% if current_user.is_authenticated %}
+                <div class="card-body">
+                    <h5 class="card-title">{{current_user.name}}님!</h5>
+                    <p class="card-text">
+                        {{current_user.email}} <br>
+                        가입일 : {{current_user.created_at|date}}
+                    </p>
+                    <a href="{{url_for('user.user_page', user_id=current_user.id)}}" class="btn btn-secondary">마이페이지</a>
+                </div>
+                {% else %}
+                <div class="card-body">
+                    <h5 class="card-title">로그인 해주세요</h5>
+                    <a href="{{url_for('auth.login')}}">로그인하기</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-md-9">
+            <div class="my-3 p-3 bg-white rounded shadow-sm">
+                <h4 class="border-gray pb-2 mb-0">최근 게시글</h6>
+                {% include '_posts.html' %}
+            </div>
+            {% if pagination %}
+            <div class="pagination">
+                {{ macros.pagination_widget(pagination, '.index') }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

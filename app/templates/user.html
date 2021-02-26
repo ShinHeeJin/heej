@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% import "_macros.html" as macros %}
+{% block title %}마이페이지{% endblock %}
+{% block page_content %}
+
+<div class="mypage row mt-5 mb-5">
+	<div class="image col-md-2">
+		<img class="img-fluid rounded-circle" src="{{url_for('static', filename='images/resources/detail-gold1.jpg')}}"
+			data-holder-rendered="true">
+	</div>
+	<div class="content col-md-9">
+		<div class="card shadow-sm">
+			<div class="card-body">
+				<h3 class="card-title pricing-card-title">&nbsp;{{user.name}}</h1>
+					<small class="text-muted">{{user.email}}</small><br>
+					<small class="text-muted">since {{user.created_at|date}}</small>
+					<ul class="list-unstyled">
+						<li>hello my name is heejin</li>
+					</ul>
+					{% if current_user == user %}
+						<a class="btn btn-outline-secondary" href="{{url_for('user.create_post')}}"><img src="{{url_for('static', filename='svg/pen.svg')}}" alt=""> 글쓰기</a>
+						<a class="btn btn-outline-secondary" href="#"><img src="{{url_for('static', filename='svg/person-lines-fill.svg')}}" alt=""> 프로필 편집</a>
+					{% endif %}
+			</div>
+		</div>
+	</div>
+	<hr>
+</div>
+<div class="row">
+	<div class="myposts col-md-11">
+		{% include '_posts.html' %}
+		{% if pagination %}
+		<div class="pagination mt-3">
+			{{ macros.pagination_widget(pagination, 'user.user_page', user_id=user.id) }}
+		</div>
+		{% endif %}
+	</div>
+</div>
+
+{% endblock %}

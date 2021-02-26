@@ -1,0 +1,9 @@
+{
+    "python.pythonPath": "env/bin/python",
+    "python.formatting.blackArgs": [
+        "--line-length",
+        "90",
+        "--fast"
+    ],
+    "python.formatting.provider": "black"
+}
