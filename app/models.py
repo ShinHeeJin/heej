@@ -15,6 +15,7 @@ class User(UserMixin, db.Model):
     name = db.Column(db.String(64), unique=False)
     confirmed = db.Column(db.Boolean, default=False)
 
+    abount_me = db.Column(db.Text, nullable=True)
     gender = db.Column(db.Enum("M", "F"), nullable=True)
     birth = db.Column(db.DateTime, nullable=True)
     location = db.Column(db.String(255), nullable=True)
