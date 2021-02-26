@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% from 'bootstrap/form.html' import render_form, render_hidden_errors, render_field %}
+
+{% block title %}Heej{% endblock %}
+
+{% block page_content %}
+<div class="row mt-5">
+	<div class="col-md-7">
+		<form action="" method="post">
+            {{ form.hidden_tag() }}
+            {{ render_hidden_errors(form) }}
+            {{ render_field(form.email) }}
+            {{ render_field(form.name) }}
+            {{ render_field(form.abount_me) }}
+            {{ render_field(form.gender) }}
+            {{ render_field(form.birth) }}
+            {{ render_field(form.location) }}
+            {{ render_field(form.job) }}
+            {{ render_field(form.submit) }}
+            <a href="{{url_for('user.user_page', user_id=current_user.id)}}" class="btn btn-outline-secondary">돌아가기</a>
+        </form>
+	</div>
+</div>
+{% endblock %}
