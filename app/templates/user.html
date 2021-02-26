@@ -12,14 +12,27 @@
 		<div class="card shadow-sm">
 			<div class="card-body">
 				<h3 class="card-title pricing-card-title">&nbsp;{{user.name}}</h1>
-					<small class="text-muted">{{user.email}}</small><br>
-					<small class="text-muted">since {{user.created_at|date}}</small>
-					<ul class="list-unstyled">
-						<li>hello my name is heejin</li>
+					<small class="text-muted">가입일 : {{user.created_at|date}}</small><br>
+					<small><img src="{{url_for('static', filename='svg/inbox.svg')}}">&nbsp;&nbsp;{{user.email}}</small>&nbsp;&nbsp;
+					<small><img src="{{url_for('static', filename='svg/birth.svg')}}">&nbsp;&nbsp;{{user.birth|date('%Y년 %m월 %d일') or '정보없음'}}</small><br>
+					<small><img src="{{url_for('static', filename='svg/gender.svg')}}">&nbsp;&nbsp;
+						{% if user.gender == 'F' %}
+							여자
+						{% elif user.gender == 'M' %}
+							남자
+						{% else %}
+							정보없음
+						{% endif %}
+					</small>&nbsp;&nbsp;
+					<small><img src="{{url_for('static', filename='svg/geo-alt.svg')}}">&nbsp;&nbsp;{{user.location or '정보없음'}}</small>&nbsp;&nbsp;
+					<small><img src="{{url_for('static', filename='svg/job.svg')}}">&nbsp;&nbsp;{{user.job or '정보없음'}}</small>
+
+					<ul class="list-unstyled mt-2">
+						<li>{{ user.abount_me or ''}}</li>
 					</ul>
 					{% if current_user == user %}
 						<a class="btn btn-outline-secondary" href="{{url_for('user.create_post')}}"><img src="{{url_for('static', filename='svg/pen.svg')}}" alt=""> 글쓰기</a>
-						<a class="btn btn-outline-secondary" href="#"><img src="{{url_for('static', filename='svg/person-lines-fill.svg')}}" alt=""> 프로필 편집</a>
+						<a class="btn btn-outline-secondary" href="{{url_for('user.edit_profile')}}"><img src="{{url_for('static', filename='svg/person-lines-fill.svg')}}" alt=""> 프로필 편집</a>
 					{% endif %}
 			</div>
 		</div>
