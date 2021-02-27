@@ -1,0 +1,26 @@
+<div class="accordion mt-3" id="accordionExample">
+    {% for post in posts %}
+    <div class="card">
+        <div class="mt-3 pr-3 pl-3">
+            <div class="post-thumbnail pr-3">
+                <img class="rounded-circle profile-thumbnail"
+                    src="{{ url_for('static', filename='images/resources/detail-gold1.jpg') }}">
+            </div>
+            <div class="post-content">
+                <div class="post-date">{{post.created_at|datetime}}</div>
+                <div class="post-author">&nbsp;&nbsp;<a
+                        href="{{url_for('user.user_page', user_id=post.user.id)}}">{{post.user.name }}</a></div>
+                <div class="post-body">&nbsp;&nbsp;&nbsp;{{ post.content }}</div>
+                <div class="post-footer">
+                    <button class="btn btn-sm mb-2" type="button" data-toggle="collapse" data-target="#post-{{post.id}}"
+                        aria-expanded="true" aria-controls="{{post.id}}">
+                        <img src="{{url_for('static', filename='svg/chat-square-text.svg')}}" alt="">&nbsp;&nbsp;댓글
+                        {{post.comments.all()|count}}
+                    </button>
+                </div>
+            </div>
+            {% include 'user/_comments.html' %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
