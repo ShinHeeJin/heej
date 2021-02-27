@@ -17,7 +17,10 @@
         {% if current_user == comment.user %}
         <div class="comment-date pl-3"><a data-toggle="modal" data-target="#comment-{{comment.id}}" style="color: grey;">수정 </a></div>
         {% endif %}
-        <div class="comment-content mt-1">
+        {% if comment.content|count >= 100 %}
+        <div class="comment-date pl-3"><a id="comment-{{comment.id}}-more" onclick="show_more_comment({{comment.id}});">더보기</a></div>
+        {% endif %}
+        <div class="comment-content mt-1 text-truncate" id="comment-body-{{comment.id}}">
             &nbsp;&nbsp;&nbsp;&nbsp;{{comment.content}}
         </div>
         <div class="modal fade" id="comment-{{comment.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">

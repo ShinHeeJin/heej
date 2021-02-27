@@ -79,7 +79,7 @@
             {{ message }}
         </div>
         {% endfor %}
-    
+
         {% block page_content %}{% endblock %}
     </div>
     {% endblock %}
@@ -87,6 +87,23 @@
     {% block scripts %}
     <!-- Optional JavaScript -->
     {{ bootstrap.load_js() }}
+    <script>
+        $(document).ready(function () {
+            $('#post-{% if comment %}{{comment.post.id}}{%else%}{{''}}{%endif%}').click()
+        });
+        function show_more_comment(comment_id) {
+            $('#comment-body-'+String(comment_id)).removeClass('text-truncate');
+            $('#comment-'+String(comment_id)+'-more').text('감추기')
+            $('#comment-'+String(comment_id)+'-more').attr('onclick','hide_comment('+String(comment_id)+');')
+        }
+        function hide_comment(comment_id){
+            $('#comment-body-'+String(comment_id)).addClass('text-truncate');
+            $('#comment-body-'+String(comment_id)).addClass('text-truncate');
+            $('#comment-body-'+String(comment_id)).addClass('text-truncate');
+            $('#comment-'+String(comment_id)+'-more').text('더보기')
+            $('#comment-'+String(comment_id)+'-more').attr('onclick','show_more_comment('+String(comment_id)+');')
+        }
+    </script>
     {% endblock %}
 </body>
 
