@@ -40,7 +40,7 @@
 	<hr>
 </div>
 <div class="row">
-	<div class="myposts col-md-11">
+	<div class="myposts col-md-12">
 		{% with end_point="user.user_page" %}
 			{% include 'user/_posts.html' %}
 		{% endwith %}
@@ -51,5 +51,12 @@
 		{% endif %}
 	</div>
 </div>
-
+{% endblock %}
+{% block scripts %}
+{{super()}}
+<script>
+    $(document).ready(function () {
+        $('#post-{% if comment %}{{comment.post.id}}{%else%}{{''}}{%endif%}').click()
+    });
+</script>
 {% endblock %}

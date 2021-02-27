@@ -12,7 +12,7 @@
                         href="{{url_for('user.user_page', user_id=post.user.id)}}">{{post.user.name }}</a></div>
                 <div class="post-body">&nbsp;&nbsp;&nbsp;{{ post.content }}</div>
                 <div class="post-footer">
-                    <button class="btn btn-sm mb-2" type="button" data-toggle="collapse" data-target="#post-{{post.id}}"
+                    <button class="btn btn-sm mb-2" id="post-{{post.id}}" type="button" data-toggle="collapse" data-target="#post-{{post.id}}"
                         aria-expanded="true" aria-controls="{{post.id}}">
                         <img src="{{url_for('static', filename='svg/chat-square-text.svg')}}" alt="">&nbsp;&nbsp;댓글
                         {{post.comments.all()|count}}

@@ -1,5 +1,5 @@
 from . import user
-from flask import render_template, redirect, url_for, request, current_app, make_response
+from flask import render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
 from ..models import User, Post, Comment
 from .forms import PostForm, EditProfileForm
@@ -12,12 +12,14 @@ def user_page(user_id):
     form = CommentForm()
     user = User.query.get_or_404(user_id)
     page = request.args.get("page", 1, type=int)
+    comment_id = request.args.get("comment_id", None)
+    comment = Comment.query.get(comment_id)
     pagination = user.posts.order_by(Post.created_at.desc()).paginate(
         page, per_page=current_app.config["POSTS_PER_PAGE"], error_out=False
     )
     posts = pagination.items
     return render_template(
-        "user.html", user=user, posts=posts, pagination=pagination, form=form
+        "user.html", user=user, posts=posts, pagination=pagination, form=form, comment=comment
     )
 
 
@@ -30,6 +32,7 @@ def create_post():
         post = Post(content=form.content.data, user=user)
         db.session.add(post)
         db.session.commit()
+        flash("게시글이 작성되었습니다.")
         return redirect(url_for("user.user_page", user_id=current_user.id))
 
     return render_template("user/post.html", form=form)
@@ -43,21 +46,43 @@ def edit_profile():
         user = current_user._get_current_object()
         form.populate_obj(user)
         db.session.commit()
+        flash("프로필이 수정 되었습니다.")
         return redirect(url_for("user.user_page", user_id=current_user.id))
     return render_template("user/profile.html", form=form)
 
 
-@user.route("/comment/<int:post_id>/<string:end_point>", methods=["POST"])
+@user.route("/post/<int:post_id>/<string:end_point>/<int:page>", methods=["POST"])
 @login_required
-def add_comment(post_id, end_point):
+def add_comment(post_id, end_point, page=1):
     form = CommentForm()
     post = Post.query.get_or_404(post_id)
-    comment = Comment(content=form.content.data.strip(), user=current_user._get_current_object())
+    comment = Comment(
+        content=form.content.data.strip(), user=current_user._get_current_object()
+    )
     post.comments.append(comment)
     db.session.commit()
+    flash("댓글이 추가되었습니다.")
     if end_point == "main.index":
-        return redirect(url_for("main.index"))
+        return redirect(url_for("main.index", page=page, comment_id=comment.id))
     elif end_point == "user.user_page":
-        return redirect(url_for("user.user_page", user_id=post.user.id))
+        return redirect(url_for("user.user_page", user_id=post.user.id, page=page, comment_id=comment.id))
     else:
-        return redirect(url_for("main.index"))
+        return redirect(url_for("main.index", page=page, comment_id=comment.id))
+
+
+@user.route("/comment/<int:comment_id>/<string:end_point>/<int:page>", methods=["POST"])
+@login_required
+def edit_comment(comment_id, end_point, page=1):
+    form = CommentForm()
+    comment = Comment.query.get_or_404(comment_id)
+    comment.content = form.content.data.strip()
+    db.session.commit()
+    flash("댓글이 수정되었습니다.")
+    if end_point == "main.index":
+        return redirect(url_for("main.index", page=page, comment_id=comment.id))
+    elif end_point == "user.user_page":
+        return redirect(
+            url_for("user.user_page", user_id=comment.post.user.id, page=page, comment_id=comment.id)
+        )
+    else:
+        return redirect(url_for("main.index", page=page, comment_id=comment.id))
