@@ -6,6 +6,10 @@
             <img class="rounded-circle profile-thumbnail"
                 src="{{ url_for('static', filename='images/resources/detail-gold1.jpg') }}">
                 {{comment.user.name}}
+                {% if current_user == comment.user and end_point == 'main.index'%}
+                <span class="badge badge-primary">나의 댓글</span>
+                {% endif %}
+                <small class="text-muted float-right mt-3">&nbsp;&nbsp;{{comment.user.email}}</small>
         </div>
         <div class="comment-date pl-3">
             {{comment.updated_at|datetime or comment.created_at|datetime}}
