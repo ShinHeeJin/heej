@@ -1,13 +1,6 @@
 from . import main
-from flask import render_template, redirect, url_for, request, current_app
-from flask_login import login_required, current_user
+from flask import render_template, request, current_app
 from ..models import Post
-from .. import db
-
-@main.route("/test")
-def test():
-    return render_template("test.html")
-
 
 @main.route("/", methods=["GET", "POST"])
 def index():
