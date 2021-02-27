@@ -1,12 +1,11 @@
 {% extends "base.html" %}
-{% from 'bootstrap/form.html' import render_form %}
-
 {% block title %}Heej{% endblock %}
 
 {% block page_content %}
 <div class="row justify-content-center mt-5">
 	<div class="col-md-6">
 		<h1>로그인</h1>
+		<hr>
 		{{ render_form(form) }} <br>
 		<a href="{{url_for('auth.password_find_request')}}">비밀번호를 잊어버리셨나요?</a><br>
 		<a href="{{url_for('auth.register')}}">아직 계정이 없으신가요?</a>
