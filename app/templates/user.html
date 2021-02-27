@@ -41,7 +41,9 @@
 </div>
 <div class="row">
 	<div class="myposts col-md-11">
-		{% include '_posts.html' %}
+		{% with end_point="user.user_page" %}
+			{% include 'user/_posts.html' %}
+		{% endwith %}
 		{% if pagination %}
 		<div class="pagination mt-3">
 			{{ macros.pagination_widget(pagination, 'user.user_page', user_id=user.id) }}

@@ -14,8 +14,27 @@
     height:50px;
     width:50px;
 }
+.comment-thumbnail > img{
+    display: inline-block;
+    height:35px;
+    width:35px;
+}
+div.comment-date {
+    color: rgb(146, 146, 146);
+    font-size: 12px;
+    float: right;
+}
 div.post-tabs {
     margin-top: 16px;
+}
+div.comment-body {
+    background-color: rgb(250, 250, 250);
+    border-radius: 10px;
+    font-size: 13px;
+}
+div.comment-body > div.comment-author {
+    font-size: 15px;
+    font-weight: bold;
 }
 ul.posts {
     list-style-type: none;
