@@ -39,6 +39,7 @@
 	</div>
 	<hr>
 </div>
+{% if user.posts.all() %}
 <div class="row">
 	<div class="myposts col-md-12">
 		{% with end_point="user.user_page" %}
@@ -51,6 +52,9 @@
 		{% endif %}
 	</div>
 </div>
+{% else %}
+게시글이 존재하지 않습니다.
+{% endif %}
 {% endblock %}
 {% block scripts %}
 {{super()}}
