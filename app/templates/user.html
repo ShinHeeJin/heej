@@ -56,11 +56,3 @@
 게시글이 존재하지 않습니다.
 {% endif %}
 {% endblock %}
-{% block scripts %}
-{{super()}}
-<script>
-    $(document).ready(function () {
-        $('#post-{% if comment %}{{comment.post.id}}{%else%}{{''}}{%endif%}').click()
-    });
-</script>
-{% endblock %}

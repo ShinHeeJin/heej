@@ -39,11 +39,3 @@
     </div>
 </div>
 {% endblock %}
-{% block scripts %}
-{{super()}}
-<script>
-    $(document).ready(function () {
-        $('#post-{% if comment %}{{comment.post.id}}{%else%}{{''}}{%endif%}').click()
-    });
-</script>
-{% endblock %}
