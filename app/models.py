@@ -141,6 +141,7 @@ class Post(db.Model):
     __tablename__ = "POST"
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     content = db.Column(db.Text)
+    updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), nullable=True)
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
     user_id = db.Column(db.BigInteger, db.ForeignKey("USER.id"))
     comments = db.relationship("Comment", backref="post", lazy="dynamic")
@@ -170,6 +171,7 @@ class Comment(db.Model):
     __tablename__ = "COMMENT"
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     content = db.Column(db.Text)
+    updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), nullable=True)
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
     disabled = db.Column(db.Boolean)
     user_id = db.Column(db.BigInteger, db.ForeignKey("USER.id"))
