@@ -39,7 +39,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField("로그인")
 
 
-class PasswordResetRequestForm(FlaskForm):
+class PasswordFindRequestForm(FlaskForm):
     email = StringField(
         "이메일", validators=[DataRequired(), Length(1, 64), Email("이메일 형식을 확인해주세요")]
     )
@@ -50,10 +50,28 @@ class PasswordResetRequestForm(FlaskForm):
             raise ValidationError("이메일이 존재하지 않습니다.")
 
 
-class PasswordResetForm(FlaskForm):
+class PasswordFindForm(FlaskForm):
     password = PasswordField(
         "새로운 비밀번호",
         validators=[DataRequired(), EqualTo("password2", message="비밀번호가 일치하지 않습니다.")],
     )
     password2 = PasswordField("비밀번호 확인", validators=[DataRequired()])
     submit = SubmitField("변경하기")
+
+class PasswordResetRequestForm(FlaskForm):
+    origin_password = PasswordField("기존 비밀번호", validators=[DataRequired("정보를 입력해주세요")])
+    new_password = PasswordField("새로운 비밀번호", validators=[DataRequired("정보를 입력해주세요"), EqualTo("confirm_password")])
+    confirm_password = PasswordField("새로운 비밀번호", validators=[DataRequired("정보를 입력해주세요")])
+    submit = SubmitField("변경")
+
+    def __init__(self, user, *args, **kwargs):
+        super(PasswordResetRequestForm, self).__init__(*args, **kwargs)
+        self.user = user
+
+    def validate_origin_password(self, field):
+        if not self.user.verify_password(field.data):
+            raise ValidationError("비밀번호가 일치하지 않습니다.")
+
+    def validate_new_password(self, field):
+        if self.user.verify_password(field.data):
+            raise ValidationError("기존 비밀번호와 동일합니다.")
