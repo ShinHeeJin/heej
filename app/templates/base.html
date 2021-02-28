@@ -89,7 +89,7 @@
     {{ bootstrap.load_js() }}
     <script>
         $(document).ready(function () {
-            $('#post-{% if comment %}{{comment.post.id}}{%else%}{{''}}{%endif%}').click()
+            $('#post-{% if post %}{{post.id}}{%else%}{{''}}{%endif%}').click()
         });
         function show_more_comment(comment_id) {
             $('#comment-body-'+String(comment_id)).removeClass('text-truncate');
