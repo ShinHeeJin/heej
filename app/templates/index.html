@@ -26,7 +26,9 @@
         <div class="col-md-9">
             <div class="my-3 p-3 bg-white rounded shadow-sm">
                 <h4 class="border-gray pb-2 mb-0">최근 게시글</h6>
-                {% include '_posts.html' %}
+                {% with end_point="main.index" %}
+                    {% include 'user/_posts.html' %}
+                {% endwith %}
             </div>
             {% if pagination %}
             <div class="pagination">

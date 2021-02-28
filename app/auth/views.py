@@ -1,5 +1,5 @@
 from . import auth
-from .forms import RegistrationForm, LoginForm, PasswordResetRequestForm, PasswordResetForm
+from .forms import RegistrationForm, LoginForm, PasswordFindRequestForm, PasswordFindForm, PasswordResetRequestForm
 from .. import db
 from ..models import User
 from ..email import send_email
@@ -60,10 +60,10 @@ def logout():
     return redirect(url_for("main.index"))
 
 
-# 비밀번호 변경
-@auth.route("/reset", methods=["GET", "POST"])
-def password_reset_request():
-    form = PasswordResetRequestForm()
+# 비밀번호 찾기 1
+@auth.route("/find", methods=["GET", "POST"])
+def password_find_request():
+    form = PasswordFindRequestForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data.lower()).first()
         if user:
@@ -74,10 +74,10 @@ def password_reset_request():
     return render_template("auth/reset_password.html", form=form)
 
 
-# 비밀번호 변경 2
-@auth.route("/reset/<token>", methods=["GET", "POST"])
-def password_reset(token):
-    form = PasswordResetForm()
+# 비밀번호 찾기 2
+@auth.route("/find/<token>", methods=["GET", "POST"])
+def password_find(token):
+    form = PasswordFindForm()
     if form.validate_on_submit():
         if User.reset_password(token, form.password.data):
             db.session.commit()
@@ -85,4 +85,20 @@ def password_reset(token):
             return redirect(url_for("auth.login"))
         else:
             return redirect(url_for("main.index"))
-    return render_template("auth/change_password.html", form=form)
+    return render_template("auth/reset_password.html", form=form)
+
+# 비밀번호 변경 1
+@auth.route("/reset", methods=['GET','POST'])
+@login_required
+def password_reset_request():
+
+    form = PasswordResetRequestForm(user=current_user._get_current_object())
+
+    if form.validate_on_submit():
+        current_user.password = form.new_password.data
+        db.session.commit()
+        flash("비밀번호가 변경되었습니다.")
+        logout_user()
+        return redirect(url_for('auth.login'))
+
+    return render_template("auth/reset_password.html", form=form)
