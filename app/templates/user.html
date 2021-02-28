@@ -39,9 +39,12 @@
 	</div>
 	<hr>
 </div>
+{% if user.posts.filter_by(deleted=False).all() %}
 <div class="row">
-	<div class="myposts col-md-11">
-		{% include '_posts.html' %}
+	<div class="myposts col-md-12">
+		{% with end_point="user.user_page" %}
+			{% include 'user/_posts.html' %}
+		{% endwith %}
 		{% if pagination %}
 		<div class="pagination mt-3">
 			{{ macros.pagination_widget(pagination, 'user.user_page', user_id=user.id) }}
@@ -49,5 +52,7 @@
 		{% endif %}
 	</div>
 </div>
-
+{% else %}
+게시글이 존재하지 않습니다.
+{% endif %}
 {% endblock %}

@@ -2,6 +2,7 @@ from flask import current_app, url_for
 from flask_login import AnonymousUserMixin, UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import func
+from flask_sqlalchemy import BaseQuery
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.exceptions import ValidationError
 from . import db, login_manager
@@ -57,12 +58,18 @@ class User(UserMixin, db.Model):
     location = db.Column(db.String(255), nullable=True)
     job = db.Column(db.String(255), nullable=True)
 
-    last_seen = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
+    last_seen = db.Column(
+        db.DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    created_at = db.Column(
+        db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True
+    )
     updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), nullable=True)
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     comments = db.relationship("Comment", backref="user", lazy="dynamic")
     like_posts = db.relationship("PostLike", back_populates="user", lazy="dynamic")
+
+    deleted = db.Column(db.Boolean, nullable=False, default=False)
 
     @property
     def password(self):
@@ -141,10 +148,16 @@ class Post(db.Model):
     __tablename__ = "POST"
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     content = db.Column(db.Text)
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
+    updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), nullable=True)
+    created_at = db.Column(
+        db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True
+    )
     user_id = db.Column(db.BigInteger, db.ForeignKey("USER.id"))
+    deleted = db.Column(db.Boolean, nullable=False, default=False)
     comments = db.relationship("Comment", backref="post", lazy="dynamic")
     like_users = db.relationship("PostLike", back_populates="post", lazy="dynamic")
+    query_class = QueryWithSoftDelete
+
     query_class = QueryWithSoftDelete
 
     # def to_json(self):
@@ -170,10 +183,16 @@ class Comment(db.Model):
     __tablename__ = "COMMENT"
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     content = db.Column(db.Text)
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
+    updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), nullable=True)
+    created_at = db.Column(
+        db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True
+    )
     disabled = db.Column(db.Boolean)
+    deleted = db.Column(db.Boolean, nullable=False, default=False)
     user_id = db.Column(db.BigInteger, db.ForeignKey("USER.id"))
     post_id = db.Column(db.BigInteger, db.ForeignKey("POST.id"))
+
+    query_class = QueryWithSoftDelete
 
     # def to_json(self):
     #     json_comment = {
