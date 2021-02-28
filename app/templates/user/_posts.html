@@ -9,9 +9,9 @@
             <div class="post-content">
                 <div class="post-date">{{post.created_at|datetime}}</div>
                 <div class="post-author">&nbsp;&nbsp;<a
-                        href="{{url_for('user.user_page', user_id=post.user.id)}}">{{post.user.name }}
+                        href="{{url_for('user.user_page', user_id=post.user.id)}}">{{post.user.name}}&nbsp;&nbsp;
                     {% if current_user == post.user and end_point == 'main.index' %}
-                    <span class="badge badge-primary">나의 게시글</span>
+                    <span class="badge badge-secondary">나의 게시글</span>
                     {% endif %}
                     </a></div>
                 <div class="post-body">&nbsp;&nbsp;&nbsp;{{ post.content }}</div>
@@ -19,7 +19,7 @@
                     <button class="btn btn-sm mb-2" id="post-{{post.id}}" type="button" data-toggle="collapse" data-target="#post-{{post.id}}"
                         aria-expanded="true" aria-controls="{{post.id}}">
                         <img src="{{url_for('static', filename='svg/chat-square-text.svg')}}" alt="">&nbsp;&nbsp;댓글
-                        {{post.comments.all()|count}}
+                        {{post.comments.filter_by(deleted=False).all()|count}}
                     </button>
                 </div>
             </div>

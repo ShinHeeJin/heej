@@ -12,14 +12,16 @@ def user_page(user_id):
     form = CommentForm()
     user = User.query.get_or_404(user_id)
     page = request.args.get("page", 1, type=int)
-    comment_id = request.args.get("comment_id", None)
-    comment = Comment.query.get(comment_id)
-    pagination = user.posts.order_by(Post.created_at.desc()).paginate(
-        page, per_page=current_app.config["POSTS_PER_PAGE"], error_out=False
+    post_id = request.args.get("postId", None)
+    post = Post.query.get(post_id)
+    pagination = (
+        user.posts.filter_by(deleted=False)
+        .order_by(Post.created_at.desc())
+        .paginate(page, per_page=current_app.config["POSTS_PER_PAGE"], error_out=False)
     )
     posts = pagination.items
     return render_template(
-        "user.html", user=user, posts=posts, pagination=pagination, form=form, comment=comment
+        "user.html", user=user, posts=posts, pagination=pagination, form=form, post=post
     )
 
 
@@ -62,27 +64,34 @@ def add_comment(post_id, end_point, page=1):
     post.comments.append(comment)
     db.session.commit()
     flash("댓글이 추가되었습니다.")
-    if end_point == "main.index":
-        return redirect(url_for("main.index", page=page, comment_id=comment.id))
-    elif end_point == "user.user_page":
-        return redirect(url_for("user.user_page", user_id=post.user.id, page=page, comment_id=comment.id))
-    else:
-        return redirect(url_for("main.index", page=page, comment_id=comment.id))
+    return redirect(
+        url_for(end_point, user_id=comment.post.user.id, page=page, postId=post.id)
+    )
 
 
 @user.route("/comment/<int:comment_id>/<string:end_point>/<int:page>", methods=["POST"])
 @login_required
 def edit_comment(comment_id, end_point, page=1):
     form = CommentForm()
-    comment = Comment.query.get_or_404(comment_id)
+    comment = Comment.query.get(comment_id)
+    post_id = comment.post.id
     comment.content = form.content.data.strip()
     db.session.commit()
     flash("댓글이 수정되었습니다.")
-    if end_point == "main.index":
-        return redirect(url_for("main.index", page=page, comment_id=comment.id))
-    elif end_point == "user.user_page":
-        return redirect(
-            url_for("user.user_page", user_id=comment.post.user.id, page=page, comment_id=comment.id)
-        )
-    else:
-        return redirect(url_for("main.index", page=page, comment_id=comment.id))
+    return redirect(
+        url_for(end_point, user_id=comment.post.user.id, page=page, postId=post_id)
+    )
+
+
+@user.route(
+    "/comment/delete/<int:comment_id>/<string:end_point>/<int:page>", methods=["POST"]
+)
+@login_required
+def delete_comment(comment_id, end_point, page=1):
+    comment = Comment.query.get(comment_id)
+    post_id = comment.post.id
+    comment.deleted = True
+    db.session.commit()
+    return redirect(
+        url_for(end_point, user_id=comment.post.user.id, page=page, postId=post_id)
+    )  # asdf

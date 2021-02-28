@@ -39,7 +39,7 @@
 	</div>
 	<hr>
 </div>
-{% if user.posts.all() %}
+{% if user.posts.filter_by(deleted=False).all() %}
 <div class="row">
 	<div class="myposts col-md-12">
 		{% with end_point="user.user_page" %}
