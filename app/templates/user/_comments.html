@@ -1,4 +1,4 @@
-<div id="post-{{post.id}}" class="collapse pt-1 pb-1 pr-3 pl-3 mb-2 comment-body" data-parent="#accordionExample">
+<div id="post-{{post.id}}" class="collapse pt-1 pb-1 pr-3 pl-3 mb-2 comment-body" data-parent="#accordionExample" aria-labelledby="post-card-header-{{post.id}}">
   {% if post.comments.filter_by(deleted=False).all() %}
     {% for comment in post.comments.filter_by(deleted=False).all() %}
     <hr class="my-1">

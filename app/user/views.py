@@ -1,5 +1,5 @@
 from . import user
-from flask import render_template, redirect, url_for, request, current_app, flash
+from flask import render_template, redirect, url_for, request, current_app, flash, jsonify
 from flask_login import login_required, current_user
 from ..models import User, Post, Comment
 from .forms import PostForm, EditProfileForm
@@ -7,7 +7,7 @@ from ..main.forms import CommentForm
 from .. import db
 
 
-@user.route("/user/<int:user_id>")
+@user.route("/<int:user_id>")
 def user_page(user_id):
     form = CommentForm()
     user = User.query.get_or_404(user_id)
@@ -25,7 +25,7 @@ def user_page(user_id):
     )
 
 
-@user.route("/user/post", methods=["GET", "POST"])
+@user.route("/post", methods=["GET", "POST"])
 @login_required
 def create_post():
     form = PostForm()
@@ -40,7 +40,7 @@ def create_post():
     return render_template("user/post.html", form=form)
 
 
-@user.route("/user", methods=["GET", "POST"])
+@user.route("/profile", methods=["GET", "POST"])
 @login_required
 def edit_profile():
     form = EditProfileForm(obj=current_user._get_current_object())
@@ -94,4 +94,21 @@ def delete_comment(comment_id, end_point, page=1):
     db.session.commit()
     return redirect(
         url_for(end_point, user_id=comment.post.user.id, page=page, postId=post_id)
-    )  # asdf
+    )
+
+@user.route("/post/<int:post_id>/like", methods=['POST', 'FETCH'])
+@login_required
+def update_post_like_status(post_id):
+    post = Post.query.get(post_id)
+    
+    if request.method == 'POST':
+        if current_user.is_liked_post(post):
+            current_user.unlike_post(post)
+        else:
+            current_user.like_post(post)
+        db.session.commit()
+        return jsonify({'isLiked':current_user.is_liked_post(post)})
+    
+    else:
+        print('update_post_like_status / fetch')
+        return jsonify({'count':post.like_users.count()})
