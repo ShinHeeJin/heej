@@ -89,19 +89,48 @@
     {{ bootstrap.load_js() }}
     <script>
         $(document).ready(function () {
-            $('#post-{% if post %}{{post.id}}{%else%}{{''}}{%endif%}').click()
+            $('#post-{% if post %}{{post.id}}{%else%}{{""}}{% endif %}').click()
         });
         function show_more_comment(comment_id) {
-            $('#comment-body-'+String(comment_id)).removeClass('text-truncate');
-            $('#comment-'+String(comment_id)+'-more').text('감추기')
-            $('#comment-'+String(comment_id)+'-more').attr('onclick','hide_comment('+String(comment_id)+');')
+            $('#comment-body-' + String(comment_id)).removeClass('text-truncate');
+            $('#comment-' + String(comment_id) + '-more').text('감추기')
+            $('#comment-' + String(comment_id) + '-more').attr('onclick', 'hide_comment(' + String(comment_id) + ');')
         }
-        function hide_comment(comment_id){
-            $('#comment-body-'+String(comment_id)).addClass('text-truncate');
-            $('#comment-body-'+String(comment_id)).addClass('text-truncate');
-            $('#comment-body-'+String(comment_id)).addClass('text-truncate');
-            $('#comment-'+String(comment_id)+'-more').text('더보기')
-            $('#comment-'+String(comment_id)+'-more').attr('onclick','show_more_comment('+String(comment_id)+');')
+        function hide_comment(comment_id) {
+            $('#comment-body-' + String(comment_id)).addClass('text-truncate');
+            $('#comment-body-' + String(comment_id)).addClass('text-truncate');
+            $('#comment-body-' + String(comment_id)).addClass('text-truncate');
+            $('#comment-' + String(comment_id) + '-more').text('더보기')
+            $('#comment-' + String(comment_id) + '-more').attr('onclick', 'show_more_comment(' + String(comment_id) + ');')
+        }
+
+        function update_post_like_count(post_id){
+            $.ajax({
+                url: "/user/post/" + post_id + "/like",
+                type:"FETCH",
+                dataType: "json",
+                success: function(result){
+                    $('button.post-like-button-'+String(post_id)+' > p').text("좋아요 " +String(result.count))
+                }
+                
+            });
+        }
+
+        function update_post_like_button(post_id) {
+            $.ajax({
+                url: "/user/post/" + post_id + "/like",
+                type: "POST",
+                dataType: "json",
+                success: function (result) {
+                    if (result.isLiked){
+                        $('#post-like-'+String(post_id)).attr('src',"{{url_for('static', filename='svg/like-fill.svg')}}")
+                    } else {
+                        $('#post-like-'+String(post_id)).attr('src',"{{url_for('static', filename='svg/like.svg')}}")
+                    }
+                    update_post_like_count(post_id);
+                }
+            });
+            return false;
         }
     </script>
     {% endblock %}
