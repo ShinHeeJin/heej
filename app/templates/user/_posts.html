@@ -1,7 +1,7 @@
 <div class="accordion mt-3" id="accordionExample">
     {% for post in posts %}
     <div class="card">
-        <div class="mt-3 mb-3 pr-3 pl-3">
+        <div class="mt-3 mb-3 pr-3 pl-3" id=post-card-header-{{post.id}}>
             <div class="post-thumbnail pr-3">
                 <img class="rounded-circle profile-thumbnail"
                     src="{{ url_for('static', filename='images/resources/detail-gold1.jpg') }}">
@@ -9,21 +9,33 @@
             <div class="post-content">
                 <div class="post-date">{{post.created_at|datetime}}</div>
                 <div class="post-author">&nbsp;&nbsp;<a
-                        href="{{url_for('user.user_page', user_id=post.user.id)}}">{{post.user.name}}&nbsp;&nbsp;
+                        href="{{url_for('user.user_page', user_id=post.user.id)}}">{{post.user.name}}
+                    </a>
                     {% if current_user == post.user and end_point == 'main.index' %}
-                    <span class="badge badge-secondary">나의 게시글</span>
+                    &nbsp;&nbsp;<span class="badge badge-secondary">나의 게시글</span>
                     {% endif %}
-                    </a></div>
+                </div>
                 <div class="post-body">&nbsp;&nbsp;&nbsp;{{ post.content }}</div>
                 <div class="post-footer">
-                    <button class="btn btn-sm mb-2" id="post-{{post.id}}" type="button" data-toggle="collapse" data-target="#post-{{post.id}}"
-                        aria-expanded="true" aria-controls="{{post.id}}">
-                        <img src="{{url_for('static', filename='svg/chat-square-text.svg')}}" alt="">&nbsp;&nbsp;댓글
-                        {{post.comments.filter_by(deleted=False).all()|count}}
+                    <button class="post-like-button-{{post.id}} btn btn-sm mb-1" {%if current_user.is_authenticated %}
+                        onclick="update_post_like_button({{post.id}});" {% else %} onclick="alert('로그인 후 이용해 주세요')" {%
+                        endif %}>
+                        {% if current_user.is_authenticated and current_user.is_liked_post(post) %}
+                        <img id="post-like-{{post.id}}" src="{{url_for('static', filename='svg/like-fill.svg')}}"
+                            alt="">
+                        {% else %}
+                        <img id="post-like-{{post.id}}" src="{{url_for('static', filename='svg/like.svg')}}" alt="">
+                        {% endif %}
+                        <p>좋아요 {{post.like_users.all()|count}}</p>
+                    </button>
+                    <button class="btn btn-sm mb-1" id="post-{{post.id}}" type="button" data-toggle="collapse"
+                        data-target="#post-{{post.id}}" aria-expanded="true" aria-controls="post-{{post.id}}">
+                        <img src="{{url_for('static', filename='svg/chat-square-text.svg')}}" alt="">
+                        <p>댓글 {{post.comments.filter_by(deleted=False).all()|count}}</p>
                     </button>
                 </div>
+                {% include 'user/_comments.html' %}
             </div>
-            {% include 'user/_comments.html' %}
         </div>
     </div>
     {% endfor %}
