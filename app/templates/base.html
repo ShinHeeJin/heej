@@ -94,12 +94,8 @@
     {{ bootstrap.load_js() }}
     <script>
         $(document).ready(function () {
-<<<<<<< HEAD
             $('#post-{% if post %}{{post.id}}{%else%}{{""}}{% endif %}').click()
             setTimeout(hide_alert, 3000);
-=======
-            $('#post-{% if post %}{{post.id}}{%else%}{{''}}{%endif%}').click()
->>>>>>> 048976f... feat : 댓글 삭제 기능 추가
         });
         function hide_alert() {
             $('.alert-flash').hide();
