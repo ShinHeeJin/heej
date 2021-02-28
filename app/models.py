@@ -83,6 +83,8 @@ class User(UserMixin, db.Model):
 
     deleted = db.Column(db.Boolean, nullable=False, default=False)
 
+    deleted = db.Column(db.Boolean, nullable=False, default=False)
+
     @property
     def password(self):
         raise AttributeError("password is not a readable attribute")
@@ -185,6 +187,8 @@ class Post(db.Model):
     deleted = db.Column(db.Boolean, nullable=False, default=False)
     comments = db.relationship("Comment", backref="post", lazy="dynamic")
     like_users = db.relationship("PostLike", back_populates="post", lazy="dynamic")
+    query_class = QueryWithSoftDelete
+
     query_class = QueryWithSoftDelete
 
     # def to_json(self):
