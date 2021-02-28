@@ -2,9 +2,39 @@ from flask import current_app, url_for
 from flask_login import AnonymousUserMixin, UserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from sqlalchemy import func
+from flask_sqlalchemy import BaseQuery
 from werkzeug.security import check_password_hash, generate_password_hash
 from app.exceptions import ValidationError
 from . import db, login_manager
+
+
+class QueryWithSoftDelete(BaseQuery):
+    _with_deleted = False
+
+    def __new__(cls, *args, **kwargs):
+        obj = super(QueryWithSoftDelete, cls).__new__(cls)
+        obj._with_deleted = kwargs.pop("_with_deleted", False)
+        if len(args) > 0:
+            super(QueryWithSoftDelete, obj).__init__(*args, **kwargs)
+            return obj.filter_by(deleted=False) if not obj._with_deleted else obj
+        return obj
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def with_deleted(self):
+        return self.__class__(
+            db.class_mapper(self._mapper_zero().class_),
+            session=db.session(),
+            _with_deleted=True,
+        )
+
+    def _get(self, *args, **kwargs):
+        return super(QueryWithSoftDelete, self).get(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        obj = self.with_deleted()._get(*args, **kwargs)
+        return obj if obj is None or self._with_deleted or not obj.deleted else None
 
 
 class User(UserMixin, db.Model):
@@ -21,11 +51,17 @@ class User(UserMixin, db.Model):
     location = db.Column(db.String(255), nullable=True)
     job = db.Column(db.String(255), nullable=True)
 
-    last_seen = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
+    last_seen = db.Column(
+        db.DateTime(timezone=True), nullable=False, server_default=func.now()
+    )
+    created_at = db.Column(
+        db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True
+    )
     updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), nullable=True)
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     comments = db.relationship("Comment", backref="user", lazy="dynamic")
+
+    deleted = db.Column(db.Boolean, nullable=False, default=False)
 
     @property
     def password(self):
@@ -94,9 +130,14 @@ class Post(db.Model):
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     content = db.Column(db.Text)
     updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), nullable=True)
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
+    created_at = db.Column(
+        db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True
+    )
     user_id = db.Column(db.BigInteger, db.ForeignKey("USER.id"))
+    deleted = db.Column(db.Boolean, nullable=False, default=False)
     comments = db.relationship("Comment", backref="post", lazy="dynamic")
+
+    query_class = QueryWithSoftDelete
 
     # def to_json(self):
     #     json_post = {
@@ -122,10 +163,15 @@ class Comment(db.Model):
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
     content = db.Column(db.Text)
     updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), nullable=True)
-    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
+    created_at = db.Column(
+        db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True
+    )
     disabled = db.Column(db.Boolean)
+    deleted = db.Column(db.Boolean, nullable=False, default=False)
     user_id = db.Column(db.BigInteger, db.ForeignKey("USER.id"))
     post_id = db.Column(db.BigInteger, db.ForeignKey("POST.id"))
+
+    query_class = QueryWithSoftDelete
 
     # def to_json(self):
     #     json_comment = {
