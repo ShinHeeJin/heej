@@ -117,20 +117,26 @@
         }
 
         function update_post_like_button(post_id) {
-            $.ajax({
-                url: "/user/post/" + post_id + "/like",
-                type: "POST",
-                dataType: "json",
-                success: function (result) {
-                    if (result.isLiked){
-                        $('#post-like-'+String(post_id)).attr('src',"{{url_for('static', filename='svg/like-fill.svg')}}")
-                    } else {
-                        $('#post-like-'+String(post_id)).attr('src',"{{url_for('static', filename='svg/like.svg')}}")
+            if ( Boolean('{{current_user.is_authenticated}}') ){
+                $.ajax({
+                    url: "/user/post/" + post_id + "/like",
+                    type: "POST",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result.isLiked){
+                            $('#post-like-'+String(post_id)).attr('src',"{{url_for('static', filename='svg/like-fill.svg')}}")
+                        } else {
+                            $('#post-like-'+String(post_id)).attr('src',"{{url_for('static', filename='svg/like.svg')}}")
+                        }
+                        update_post_like_count(post_id);
                     }
-                    update_post_like_count(post_id);
-                }
-            });
-            return false;
+                });
+                return false;
+            } else {
+                alert('로그인후 사용해주세요')
+            }
+
+
         }
     </script>
     {% endblock %}

@@ -97,10 +97,11 @@ def delete_comment(comment_id, end_point, page=1):
     )
 
 @user.route("/post/<int:post_id>/like", methods=['POST', 'FETCH'])
-@login_required
 def update_post_like_status(post_id):
     post = Post.query.get(post_id)
     
+    print(current_user)
+
     if request.method == 'POST':
         if current_user.is_liked_post(post):
             current_user.unlike_post(post)
