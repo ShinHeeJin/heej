@@ -45,12 +45,15 @@
 	<hr>
 </div>
 {% if user.posts.filter_by(deleted=False).all() %}
+<<<<<<< HEAD
 <nav>
 	<div class="nav nav-tabs" id="nav-tab" role="tablist">
 		<a {% if tab_status == 'post' %} class="nav-link active" {%else%} class="nav-link" {% endif %} href="{{url_for('user.update_tab_cookie', status='post', user_id=user.id)}}">게시글</a>
 		<a {% if tab_status == 'like' %} class="nav-link active" {%else%} class="nav-link" {% endif %} href="{{url_for('user.update_tab_cookie', status='like', user_id=user.id)}}">좋아요</a>
 	</div>
 </nav>
+=======
+>>>>>>> 048976f... feat : 댓글 삭제 기능 추가
 <div class="row">
 	<div class="myposts col-md-12">
 		{% with end_point="user.user_page" %}

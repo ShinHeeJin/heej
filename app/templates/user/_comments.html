@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div id="post-{{post.id}}" class="collapse pt-1 pb-1 pr-3 pl-3 mb-2 comment-body" data-parent="#accordionExample"
   aria-labelledby="post-card-header-{{post.id}}">
   {% if post.comments.filter_by(deleted=False).all() %}
@@ -40,6 +41,38 @@
   {% include 'user/_comment_edit_modal.html' %}
   {% include 'user/_comment_delete_modal.html' %}
   {% endfor %}
+=======
+<div id="post-{{post.id}}" class="collapse pt-1 pb-1 pr-3 pl-3 mb-2 comment-body" data-parent="#accordionExample">
+  {% if post.comments.filter_by(deleted=False).all() %}
+    {% for comment in post.comments.filter_by(deleted=False).all() %}
+    <hr class="my-1">
+    <div class="comment-thumbnail comment-author mt-1">
+      <img class="rounded-circle profile-thumbnail"
+        src="{{ url_for('static', filename='images/resources/detail-gold1.jpg') }}">
+      {{comment.user.name}}
+      {% if current_user == comment.user and end_point == 'main.index'%}
+      <span class="badge badge-primary">나의 댓글</span>
+      {% endif %}
+      <small class="text-muted float-right mt-3">&nbsp;&nbsp;{{comment.user.email}}</small>
+    </div>
+    <div class="comment-date pl-3">
+      {{comment.updated_at|datetime or comment.created_at|datetime}}
+    </div>
+    {% if current_user == comment.user %}
+    <div class="comment-date pl-2"><a data-toggle="modal" data-target="#comment-delete-{{comment.id}}" style="color: grey;">삭제</a></div>
+    <div class="comment-date pl-2"><a data-toggle="modal" data-target="#comment-edit-{{comment.id}}" style="color: grey;">수정</a></div>
+    {% endif %}
+    {% if comment.content|count >= 100 %}
+    <div class="comment-date pl-1"><a id="comment-{{comment.id}}-more"
+        onclick="show_more_comment({{comment.id}});">더보기</a></div>
+    {% endif %}
+    <div class="comment-content mt-1 text-truncate" id="comment-body-{{comment.id}}">
+      &nbsp;&nbsp;&nbsp;&nbsp;{{comment.content}}
+    </div>
+    {% include 'user/_comment_edit_modal.html' %}
+    {% include 'user/_comment_delete_modal.html' %}
+    {% endfor %}
+>>>>>>> 048976f... feat : 댓글 삭제 기능 추가
   {% endif %}
   {% if current_user.is_authenticated %}
   <div class="mt-3">
