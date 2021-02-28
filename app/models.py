@@ -7,6 +7,42 @@ from app.exceptions import ValidationError
 from . import db, login_manager
 
 
+class QueryWithSoftDelete(BaseQuery):
+    _with_deleted = False
+
+    def __new__(cls, *args, **kwargs):
+        obj = super(QueryWithSoftDelete, cls).__new__(cls)
+        obj._with_deleted = kwargs.pop("_with_deleted", False)
+        if len(args) > 0:
+            super(QueryWithSoftDelete, obj).__init__(*args, **kwargs)
+            return obj.filter_by(deleted=False) if not obj._with_deleted else obj
+        return obj
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def with_deleted(self):
+        return self.__class__(
+            db.class_mapper(self._mapper_zero().class_),
+            session=db.session(),
+            _with_deleted=True,
+        )
+
+    def _get(self, *args, **kwargs):
+        return super(QueryWithSoftDelete, self).get(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        obj = self.with_deleted()._get(*args, **kwargs)
+        return obj if obj is None or self._with_deleted or not obj.deleted else None
+
+class PostLike(db.Model):
+    __tablename__ = "USER_POST_LIKE"
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.BigInteger, db.ForeignKey("USER.id"), primary_key=True)
+    post_id = db.Column(db.BigInteger, db.ForeignKey("POST.id"), primary_key=True)
+    user = db.relationship("User", back_populates="like_posts")
+    post = db.relationship("Post", back_populates="like_users")
+
 class User(UserMixin, db.Model):
     __tablename__ = "USER"
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
@@ -26,6 +62,7 @@ class User(UserMixin, db.Model):
     updated_at = db.Column(db.DateTime(timezone=True), onupdate=func.now(), nullable=True)
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     comments = db.relationship("Comment", backref="user", lazy="dynamic")
+    like_posts = db.relationship("PostLike", back_populates="user", lazy="dynamic")
 
     @property
     def password(self):
@@ -71,7 +108,18 @@ class User(UserMixin, db.Model):
         user.password = new_password
         db.session.add(user)
         return True
+    
+    def is_liked_post(self, post):
+        return True if self.like_posts.filter_by(post=post).first() else False
 
+    def like_post(self, post):
+        if not self.is_liked_post(post):
+            new_post_like = PostLike(user=self, post=post)
+            db.session.add(new_post_like)
+
+    def unlike_post(self, post):
+        if self.is_liked_post(post):
+            self.like_posts.filter_by(post=post).delete()
 
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
@@ -96,6 +144,8 @@ class Post(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), index=True)
     user_id = db.Column(db.BigInteger, db.ForeignKey("USER.id"))
     comments = db.relationship("Comment", backref="post", lazy="dynamic")
+    like_users = db.relationship("PostLike", back_populates="post", lazy="dynamic")
+    query_class = QueryWithSoftDelete
 
     # def to_json(self):
     #     json_post = {
