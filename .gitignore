@@ -40,6 +40,7 @@ nosetests.xml
 
 # Virtual environment
 venv
+env/
 
 # Environment files
 .env
