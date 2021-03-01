@@ -40,7 +40,10 @@ nosetests.xml
 
 # Virtual environment
 venv
+env/
 
 # Environment files
 .env
 .env-mysql
+
+run.sh
