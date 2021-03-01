@@ -34,7 +34,7 @@ def create_post():
         post = Post(content=form.content.data, user=user)
         db.session.add(post)
         db.session.commit()
-        flash("게시글이 작성되었습니다.")
+        flash("게시글이 작성되었습니다.","success")
         return redirect(url_for("user.user_page", user_id=current_user.id))
 
     return render_template("user/post.html", form=form)
@@ -48,7 +48,7 @@ def edit_profile():
         user = current_user._get_current_object()
         form.populate_obj(user)
         db.session.commit()
-        flash("프로필이 수정 되었습니다.")
+        flash("프로필이 수정 되었습니다.","success")
         return redirect(url_for("user.user_page", user_id=current_user.id))
     return render_template("user/profile.html", form=form)
 
@@ -63,7 +63,7 @@ def add_comment(post_id, end_point, page=1):
     )
     post.comments.append(comment)
     db.session.commit()
-    flash("댓글이 추가되었습니다.")
+    flash("댓글이 추가되었습니다.","success")
     return redirect(
         url_for(end_point, user_id=comment.post.user.id, page=page, postId=post.id)
     )
@@ -77,7 +77,7 @@ def edit_comment(comment_id, end_point, page=1):
     post_id = comment.post.id
     comment.content = form.content.data.strip()
     db.session.commit()
-    flash("댓글이 수정되었습니다.")
+    flash("댓글이 수정되었습니다.","success")
     return redirect(
         url_for(end_point, user_id=comment.post.user.id, page=page, postId=post_id)
     )
@@ -92,6 +92,7 @@ def delete_comment(comment_id, end_point, page=1):
     post_id = comment.post.id
     comment.deleted = True
     db.session.commit()
+    flash('댓글이 삭제되었습니다.', 'success')
     return redirect(
         url_for(end_point, user_id=comment.post.user.id, page=page, postId=post_id)
     )

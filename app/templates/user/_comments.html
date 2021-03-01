@@ -10,7 +10,7 @@
     {% if current_user == comment.user and end_point == 'main.index'%}
     <span class="badge badge-primary mr-1 ml-1">나의 댓글</span>
     {% endif %}
-    <a {%if current_user.is_authenticated %}
+    <a class="float-right text-muted mt-1 mr-1" {%if current_user.is_authenticated %}
     onclick="update_comment_like_button({{comment.id}});" {% else %} onclick="alert('로그인 후 이용해 주세요')" {%
     endif %}>
       {% if current_user.is_authenticated and current_user.is_liked_comment(comment) %}
@@ -18,9 +18,8 @@
       {% else %}
       <img id="comment-like-{{comment.id}}" src="{{url_for('static', filename='svg/like.svg')}}" alt="" style="width:15px; height:15px;">
       {% endif %}
+      <span id="comment-like-button-{{comment.id}}" style="font-size:13px;">{{comment.like_users.count()}}명</span>
     </a>
-    <span id="comment-like-button-{{comment.id}}" style="font-size:13px;">{{comment.like_users.count()}}</span>
-    <small class="text-muted float-right mt-3">&nbsp;&nbsp;{{comment.user.email}}</small>
   </div>
   <div class="comment-date pl-3">
     {{comment.updated_at|datetime or comment.created_at|datetime}}

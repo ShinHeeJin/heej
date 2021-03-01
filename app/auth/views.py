@@ -17,8 +17,9 @@ def login():
             next = request.args.get("next")
             if next is None or not next.startswith("/"):
                 next = url_for("main.index")
+            flash("로그인 되었습니다.", "primary")
             return redirect(next)
-        flash("메일 혹은 비밀번호가 유효하지 않습니다.")
+        flash("메일 혹은 비밀번호가 유효하지 않습니다.","danger")
     return render_template("auth/login.html", form=form)
 
 
@@ -32,7 +33,7 @@ def register():
         db.session.commit()
         token = user.generate_confirmation_token()
         send_email(user.email, "인증메일 발송", "auth/email/confirm", user=user, token=token)
-        flash("인증메일이 발송되었습니다. 메일을 확인해주세요")
+        flash("인증메일이 발송되었습니다. 메일을 확인해주세요","success")
         return redirect(url_for("auth.login"))
     return render_template("auth/register.html", form=form)
 
@@ -45,9 +46,9 @@ def confirm(token):
         return redirect(url_for("main.index"))
     if current_user.confirm(token):
         db.session.commit()
-        flash("메일 인증이 완료되었습니다!")
+        flash("메일 인증이 완료되었습니다!","success")
     else:
-        flash("인증링크가 유효하지 않거나 인증이 만료되었습니다.")
+        flash("인증링크가 유효하지 않거나 인증이 만료되었습니다.","danger")
     return redirect(url_for("main.index"))
 
 
@@ -56,6 +57,7 @@ def confirm(token):
 @login_required
 def logout():
     logout_user()
+    flash("로그아웃 되었습니다.", "warning")
     return redirect(url_for("main.index"))
 
 
@@ -68,7 +70,7 @@ def password_find_request():
         if user:
             token = user.generate_reset_token()
             send_email(user.email, "비밀번호 재설정", "auth/email/reset_password", user=user, token=token)
-        flash("비밀번호 재설정을 위한 안내메일이 발송되었습니다.")
+        flash("비밀번호 재설정을 위한 안내메일이 발송되었습니다.","success")
         return redirect(url_for("auth.login"))
     return render_template("auth/reset_password.html", form=form)
 
@@ -80,7 +82,7 @@ def password_find(token):
     if form.validate_on_submit():
         if User.reset_password(token, form.password.data):
             db.session.commit()
-            flash("비밀번호가 변경되었습니다.")
+            flash("비밀번호가 변경되었습니다.","success")
             return redirect(url_for("auth.login"))
         else:
             return redirect(url_for("main.index"))
@@ -96,7 +98,7 @@ def password_reset_request():
     if form.validate_on_submit():
         current_user.password = form.new_password.data
         db.session.commit()
-        flash("비밀번호가 변경되었습니다.")
+        flash("비밀번호가 변경되었습니다.","success")
         logout_user()
         return redirect(url_for('auth.login'))
 
