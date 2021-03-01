@@ -80,7 +80,6 @@ class User(UserMixin, db.Model):
     comments = db.relationship("Comment", backref="user", lazy="dynamic")
     like_posts = db.relationship("PostLike", back_populates="user", lazy="dynamic")
     like_comments = db.relationship("CommentLike", back_populates="user", lazy="dynamic")
-
     deleted = db.Column(db.Boolean, nullable=False, default=False)
 
     @property
