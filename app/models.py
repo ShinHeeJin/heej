@@ -186,8 +186,6 @@ class Post(db.Model):
     like_users = db.relationship("PostLike", back_populates="post", lazy="dynamic")
     query_class = QueryWithSoftDelete
 
-    query_class = QueryWithSoftDelete
-
     # def to_json(self):
     #     json_post = {
     #         "url": url_for("api.get_post", id=self.id),
