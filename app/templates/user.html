@@ -2,7 +2,6 @@
 {% import "_macros.html" as macros %}
 {% block title %}마이페이지{% endblock %}
 {% block page_content %}
-
 <div class="mypage row mt-5 mb-5">
 	<div class="image col-md-2">
 		<img class="img-fluid rounded-circle" src="{{url_for('static', filename='images/resources/detail-gold1.jpg')}}"
@@ -13,26 +12,32 @@
 			<div class="card-body">
 				<h3 class="card-title pricing-card-title">&nbsp;{{user.name}}</h1>
 					<small class="text-muted">가입일 : {{user.created_at|date}}</small><br>
-					<small><img src="{{url_for('static', filename='svg/inbox.svg')}}">&nbsp;&nbsp;{{user.email}}</small>&nbsp;&nbsp;
-					<small><img src="{{url_for('static', filename='svg/birth.svg')}}">&nbsp;&nbsp;{{user.birth|date('%Y년 %m월 %d일') or '정보없음'}}</small><br>
+					<small><img
+							src="{{url_for('static', filename='svg/inbox.svg')}}">&nbsp;&nbsp;{{user.email}}</small>&nbsp;&nbsp;
+					<small><img src="{{url_for('static', filename='svg/birth.svg')}}">&nbsp;&nbsp;{{user.birth|date('%Y년
+						%m월 %d일') or '정보없음'}}</small><br>
 					<small><img src="{{url_for('static', filename='svg/gender.svg')}}">&nbsp;&nbsp;
 						{% if user.gender == 'F' %}
-							여자
+						여자
 						{% elif user.gender == 'M' %}
-							남자
+						남자
 						{% else %}
-							정보없음
+						정보없음
 						{% endif %}
 					</small>&nbsp;&nbsp;
-					<small><img src="{{url_for('static', filename='svg/geo-alt.svg')}}">&nbsp;&nbsp;{{user.location or '정보없음'}}</small>&nbsp;&nbsp;
-					<small><img src="{{url_for('static', filename='svg/job.svg')}}">&nbsp;&nbsp;{{user.job or '정보없음'}}</small>
+					<small><img src="{{url_for('static', filename='svg/geo-alt.svg')}}">&nbsp;&nbsp;{{user.location or
+						'정보없음'}}</small>&nbsp;&nbsp;
+					<small><img src="{{url_for('static', filename='svg/job.svg')}}">&nbsp;&nbsp;{{user.job or
+						'정보없음'}}</small>
 
 					<ul class="list-unstyled mt-2">
 						<li>{{ user.abount_me or ''}}</li>
 					</ul>
 					{% if current_user == user %}
-						<a class="btn btn-outline-secondary" href="{{url_for('user.create_post')}}"><img src="{{url_for('static', filename='svg/pen.svg')}}" alt=""> 글쓰기</a>
-						<a class="btn btn-outline-secondary" href="{{url_for('user.edit_profile')}}"><img src="{{url_for('static', filename='svg/person-lines-fill.svg')}}" alt=""> 프로필 편집</a>
+					<a class="btn btn-outline-secondary" href="{{url_for('user.create_post')}}"><img
+							src="{{url_for('static', filename='svg/pen.svg')}}" alt=""> 글쓰기</a>
+					<a class="btn btn-outline-secondary" href="{{url_for('user.edit_profile')}}"><img
+							src="{{url_for('static', filename='svg/person-lines-fill.svg')}}" alt=""> 프로필 편집</a>
 					{% endif %}
 			</div>
 		</div>
@@ -40,10 +45,16 @@
 	<hr>
 </div>
 {% if user.posts.filter_by(deleted=False).all() %}
+<nav>
+	<div class="nav nav-tabs" id="nav-tab" role="tablist">
+		<a {% if tab_status == 'post' %} class="nav-link active" {%else%} class="nav-link" {% endif %} href="{{url_for('user.update_tab_cookie', status='post', user_id=user.id)}}">게시글</a>
+		<a {% if tab_status == 'like' %} class="nav-link active" {%else%} class="nav-link" {% endif %} href="{{url_for('user.update_tab_cookie', status='like', user_id=user.id)}}">좋아요</a>
+	</div>
+</nav>
 <div class="row">
 	<div class="myposts col-md-12">
 		{% with end_point="user.user_page" %}
-			{% include 'user/_posts.html' %}
+		{% include 'user/_posts.html' %}
 		{% endwith %}
 		{% if pagination %}
 		<div class="pagination mt-3">
@@ -52,6 +63,7 @@
 		{% endif %}
 	</div>
 </div>
+
 {% else %}
 게시글이 존재하지 않습니다.
 {% endif %}

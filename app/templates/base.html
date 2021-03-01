@@ -73,8 +73,13 @@
     <!-- Your page content -->
     {% block content %}
     <div class="container">
+        {% if not current_user.is_authenticated and request.blueprint != 'auth' %}
+        <div class="alert alert-danger">
+            로그인 후 이용해 주세요.
+        </div>
+        {% endif %}
         {% for category, message in get_flashed_messages(with_categories=true) %}
-        <div class="alert alert-{{ category }}">
+        <div class="alert-flash alert alert-{{ category }}">
             <button type="button" class="close" data-dismiss="alert">&times;</button>
             {{ message }}
         </div>
@@ -92,8 +97,8 @@
             $('#post-{% if post %}{{post.id}}{%else%}{{""}}{% endif %}').click()
             setTimeout(hide_alert, 3000);
         });
-        function hide_alert(){
-            $('.alert').hide();
+        function hide_alert() {
+            $('.alert-flash').hide();
         }
         function show_more_comment(comment_id) {
             $('#comment-body-' + String(comment_id)).removeClass('text-truncate');
@@ -108,29 +113,29 @@
             $('#comment-' + String(comment_id) + '-more').attr('onclick', 'show_more_comment(' + String(comment_id) + ');')
         }
 
-        function update_post_like_count(post_id){
+        function update_post_like_count(post_id) {
             $.ajax({
                 url: "/user/post/" + post_id + "/like",
-                type:"FETCH",
+                type: "FETCH",
                 dataType: "json",
-                success: function(result){
-                    $('button.post-like-button-'+String(post_id)+' > p').text("좋아요 " +String(result.count))
+                success: function (result) {
+                    $('button.post-like-button-' + String(post_id) + ' > p').text("좋아요 " + String(result.count))
                 }
-                
+
             });
         }
 
         function update_post_like_button(post_id) {
-            if ( Boolean('{{current_user.is_authenticated}}') ){
+            if (Boolean('{{current_user.is_authenticated}}')) {
                 $.ajax({
                     url: "/user/post/" + post_id + "/like",
                     type: "POST",
                     dataType: "json",
                     success: function (result) {
-                        if (result.isLiked){
-                            $('#post-like-'+String(post_id)).attr('src',"{{url_for('static', filename='svg/like-fill.svg')}}")
+                        if (result.isLiked) {
+                            $('#post-like-' + String(post_id)).attr('src', "{{url_for('static', filename='svg/like-fill.svg')}}")
                         } else {
-                            $('#post-like-'+String(post_id)).attr('src',"{{url_for('static', filename='svg/like.svg')}}")
+                            $('#post-like-' + String(post_id)).attr('src', "{{url_for('static', filename='svg/like.svg')}}")
                         }
                         update_post_like_count(post_id);
                     }
@@ -141,29 +146,29 @@
             }
         }
 
-        function update_comment_like_count(comment_id){
+        function update_comment_like_count(comment_id) {
             $.ajax({
                 url: "/user/comment/" + comment_id + "/like",
-                type:"FETCH",
+                type: "FETCH",
                 dataType: "json",
-                success: function(result){
-                    $('span#comment-like-button-'+String(comment_id)).text(String(result.count)+"명")
+                success: function (result) {
+                    $('span#comment-like-button-' + String(comment_id)).text(String(result.count) + "명")
                 }
-                
+
             });
         }
 
         function update_comment_like_button(comment_id) {
-            if ( Boolean('{{current_user.is_authenticated}}') ){
+            if (Boolean('{{current_user.is_authenticated}}')) {
                 $.ajax({
                     url: "/user/comment/" + comment_id + "/like",
                     type: "POST",
                     dataType: "json",
                     success: function (result) {
-                        if (result.isLiked){
-                            $('#comment-like-'+String(comment_id)).attr('src',"{{url_for('static', filename='svg/like-fill.svg')}}")
+                        if (result.isLiked) {
+                            $('#comment-like-' + String(comment_id)).attr('src', "{{url_for('static', filename='svg/like-fill.svg')}}")
                         } else {
-                            $('#comment-like-'+String(comment_id)).attr('src',"{{url_for('static', filename='svg/like.svg')}}")
+                            $('#comment-like-' + String(comment_id)).attr('src', "{{url_for('static', filename='svg/like.svg')}}")
                         }
                         update_comment_like_count(comment_id);
                     }
