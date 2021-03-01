@@ -135,8 +135,39 @@
             } else {
                 alert('로그인후 사용해주세요')
             }
+        }
 
+        function update_comment_like_count(comment_id){
+            $.ajax({
+                url: "/user/comment/" + comment_id + "/like",
+                type:"FETCH",
+                dataType: "json",
+                success: function(result){
+                    $('span#comment-like-button-'+String(comment_id)).text(String(result.count))
+                }
+                
+            });
+        }
 
+        function update_comment_like_button(comment_id) {
+            if ( Boolean('{{current_user.is_authenticated}}') ){
+                $.ajax({
+                    url: "/user/comment/" + comment_id + "/like",
+                    type: "POST",
+                    dataType: "json",
+                    success: function (result) {
+                        if (result.isLiked){
+                            $('#comment-like-'+String(comment_id)).attr('src',"{{url_for('static', filename='svg/like-fill.svg')}}")
+                        } else {
+                            $('#comment-like-'+String(comment_id)).attr('src',"{{url_for('static', filename='svg/like.svg')}}")
+                        }
+                        update_comment_like_count(comment_id);
+                    }
+                });
+                return false;
+            } else {
+                alert('로그인후 사용해주세요')
+            }
         }
     </script>
     {% endblock %}

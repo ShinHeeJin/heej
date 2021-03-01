@@ -96,20 +96,30 @@ def delete_comment(comment_id, end_point, page=1):
         url_for(end_point, user_id=comment.post.user.id, page=page, postId=post_id)
     )
 
-@user.route("/post/<int:post_id>/like", methods=['POST', 'FETCH'])
+
+@user.route("/post/<int:post_id>/like", methods=["POST", "FETCH"])
 def update_post_like_status(post_id):
     post = Post.query.get(post_id)
-    
-    print(current_user)
-
-    if request.method == 'POST':
+    if request.method == "POST":
         if current_user.is_liked_post(post):
             current_user.unlike_post(post)
         else:
             current_user.like_post(post)
         db.session.commit()
-        return jsonify({'isLiked':current_user.is_liked_post(post)})
-    
+        return jsonify({"isLiked": current_user.is_liked_post(post)})
     else:
-        print('update_post_like_status / fetch')
-        return jsonify({'count':post.like_users.count()})
+        return jsonify({"count": post.like_users.count()})
+
+
+@user.route("/comment/<int:comment_id>/like", methods=["POST", "FETCH"])
+def update_comment_like_status(comment_id):
+    comment = Comment.query.get(comment_id)
+    if request.method == "POST":
+        if current_user.is_liked_comment(comment):
+            current_user.unlike_comment(comment)
+        else:
+            current_user.like_comment(comment)
+        db.session.commit()
+        return jsonify({"isLiked": current_user.is_liked_comment(comment)})
+    else:
+        return jsonify({"count": comment.like_users.count()})

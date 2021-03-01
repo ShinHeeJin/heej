@@ -34,8 +34,8 @@
                         <p>댓글 {{post.comments.filter_by(deleted=False).all()|count}}</p>
                     </button>
                 </div>
-                {% include 'user/_comments.html' %}
             </div>
+            {% include 'user/_comments.html' %}
         </div>
     </div>
     {% endfor %}
