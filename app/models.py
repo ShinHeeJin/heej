@@ -128,6 +128,8 @@ class User(UserMixin, db.Model):
         db.session.add(user)
         return True
 
+    # POST like utils functions -----------
+
     def is_liked_post(self, post):
         return True if self.like_posts.filter_by(post=post).first() else False
 
@@ -139,6 +141,20 @@ class User(UserMixin, db.Model):
     def unlike_post(self, post):
         if self.is_liked_post(post):
             self.like_posts.filter_by(post=post).delete()
+
+    # COMMENT like utils functions -----------
+
+    def is_liked_comment(self, comment):
+        return True if self.like_comments.filter_by(comment=comment).first() else False
+
+    def like_comment(self, comment):
+        if not self.is_liked_comment(comment):
+            new_comment_like = CommentLike(user=self, comment=comment)
+            db.session.add(new_comment_like)
+    
+    def unlike_comment(self, comment):
+        if self.is_liked_comment(comment):
+            self.like_comments.filter_by(comment=comment).delete()
 
 
 class AnonymousUser(AnonymousUserMixin):
@@ -169,8 +185,6 @@ class Post(db.Model):
     deleted = db.Column(db.Boolean, nullable=False, default=False)
     comments = db.relationship("Comment", backref="post", lazy="dynamic")
     like_users = db.relationship("PostLike", back_populates="post", lazy="dynamic")
-    query_class = QueryWithSoftDelete
-
     query_class = QueryWithSoftDelete
 
     # def to_json(self):
