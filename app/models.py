@@ -36,6 +36,7 @@ class QueryWithSoftDelete(BaseQuery):
         obj = self.with_deleted()._get(*args, **kwargs)
         return obj if obj is None or self._with_deleted or not obj.deleted else None
 
+
 class PostLike(db.Model):
     __tablename__ = "USER_POST_LIKE"
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
@@ -43,6 +44,16 @@ class PostLike(db.Model):
     post_id = db.Column(db.BigInteger, db.ForeignKey("POST.id"), primary_key=True)
     user = db.relationship("User", back_populates="like_posts")
     post = db.relationship("Post", back_populates="like_users")
+
+
+class CommentLike(db.Model):
+    __tablename__ = "USER_COMMENT_LIKE"
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.BigInteger, db.ForeignKey("USER.id"), primary_key=True)
+    comment_id = db.Column(db.BigInteger, db.ForeignKey("COMMENT.id"), primary_key=True)
+    user = db.relationship("User", back_populates="like_comments")
+    comment = db.relationship("Comment", back_populates="like_users")
+
 
 class User(UserMixin, db.Model):
     __tablename__ = "USER"
@@ -68,6 +79,7 @@ class User(UserMixin, db.Model):
     posts = db.relationship("Post", backref="user", lazy="dynamic")
     comments = db.relationship("Comment", backref="user", lazy="dynamic")
     like_posts = db.relationship("PostLike", back_populates="user", lazy="dynamic")
+    like_comments = db.relationship("CommentLike", back_populates="user", lazy="dynamic")
 
     deleted = db.Column(db.Boolean, nullable=False, default=False)
 
@@ -115,7 +127,7 @@ class User(UserMixin, db.Model):
         user.password = new_password
         db.session.add(user)
         return True
-    
+
     def is_liked_post(self, post):
         return True if self.like_posts.filter_by(post=post).first() else False
 
@@ -127,6 +139,7 @@ class User(UserMixin, db.Model):
     def unlike_post(self, post):
         if self.is_liked_post(post):
             self.like_posts.filter_by(post=post).delete()
+
 
 class AnonymousUser(AnonymousUserMixin):
     def can(self, permissions):
@@ -192,6 +205,7 @@ class Comment(db.Model):
     user_id = db.Column(db.BigInteger, db.ForeignKey("USER.id"))
     post_id = db.Column(db.BigInteger, db.ForeignKey("POST.id"))
 
+    like_users = db.relationship("CommentLike", back_populates="comment", lazy="dynamic")
     query_class = QueryWithSoftDelete
 
     # def to_json(self):
