@@ -44,3 +44,5 @@ venv
 # Environment files
 .env
 .env-mysql
+
+run.sh
